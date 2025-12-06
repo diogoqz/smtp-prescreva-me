@@ -5,8 +5,10 @@ services:
     build: .
     container_name: smtp-prescreva-me
     ports:
-      # Porta 2525 (desenvolvimento/produção sem root)
+      # Porta SMTP
       - "2525:2525"
+      # Porta Web
+      - "3000:3000"
       # Descomente as portas abaixo se tiver privilégios root
       # - "25:25"
       # - "587:587"

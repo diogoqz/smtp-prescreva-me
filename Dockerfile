@@ -11,13 +11,14 @@ RUN npm ci --only=production
 # Copiar código da aplicação
 COPY . .
 
-# Criar diretório para emails
-RUN mkdir -p emails
+# Criar diretórios necessários
+RUN mkdir -p emails public
 
-# Expor porta SMTP
+# Expor portas
 EXPOSE 2525
+EXPOSE 3000
 
-# Comando para iniciar o servidor
-CMD ["node", "server.js"]
+# Comando para iniciar ambos os servidores
+CMD ["node", "start.js"]
 
 

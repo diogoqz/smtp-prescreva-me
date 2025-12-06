@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TempMail - prescreva.me</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.2em;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin-bottom: 30px;
+    }
+
+    .create-inbox {
+      text-align: center;
+    }
+
+    .create-inbox h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto 20px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 0 20px;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: #667eea;
+      background: white;
+    }
+
+    .input-wrapper input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 15px 10px;
+      font-size: 1.1em;
+      outline: none;
+    }
+
+    .input-wrapper .domain {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .btn {
+      padding: 15px 40px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .current-inbox {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .current-inbox.active {
+      display: block;
+    }
+
+    .current-inbox h3 {
+      font-size: 0.9em;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .current-inbox .email-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .current-inbox .email-address {
+      font-size: 1.5em;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid white;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .copy-btn:hover {
+      background: white;
+      color: #667eea;
+    }
+
+    .emails-section {
+      display: none;
+    }
+
+    .emails-section.active {
+      display: block;
+    }
+
+    .emails-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .emails-header h2 {
+      color: #333;
+    }
+
+    .email-count {
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state svg {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+
+    .email-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .email-item {
+      background: #f9f9f9;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .email-item:hover {
+      border-color: #667eea;
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .email-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+
+    .email-from {
+      font-weight: 600;
+      color: #333;
+      font-size: 1.1em;
+    }
+
+    .email-time {
+      color: #999;
+      font-size: 0.9em;
+    }
+
+    .email-subject {
+      font-size: 1em;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .email-preview {
+      color: #999;
+      font-size: 0.9em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .email-detail {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .email-detail.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .email-detail-content {
+      background: white;
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .email-detail-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 20px 20px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid white;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .close-btn:hover {
+      background: white;
+      color: #667eea;
+      transform: rotate(90deg);
+    }
+
+    .email-detail-body {
+      padding: 30px;
+    }
+
+    .email-meta {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .email-meta-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .email-meta-label {
+      font-weight: 600;
+      color: #667eea;
+      width: 100px;
+    }
+
+    .email-meta-value {
+      color: #333;
+      flex: 1;
+    }
+
+    .email-content {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: monospace;
+      line-height: 1.6;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .notification.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+
+      .email-display {
+        flex-direction: column;
+        align-items: start !important;
+      }
+
+      .email-item-header {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📧 TempMail</h1>
+      <p>Email temporário descartável - prescreva.me</p>
+    </div>
+
+    <div class="card create-inbox">
+      <h2>Criar Email Temporário</h2>
+      <div class="input-group">
+        <div class="input-wrapper">
+          <input type="text" id="username" placeholder="escolha-seu-nome" pattern="[a-zA-Z0-9._-]+" required>
+          <span class="domain">@prescreva.me</span>
+        </div>
+        <button class="btn btn-primary" onclick="createInbox()">Criar</button>
+      </div>
+      <p style="color: #999; font-size: 0.9em;">Use apenas letras, números, pontos, hífens e underscores</p>
+    </div>
+
+    <div class="card current-inbox" id="currentInbox">
+      <h3>SEU EMAIL TEMPORÁRIO</h3>
+      <div class="email-display">
+        <div class="email-address" id="currentEmail"></div>
+        <button class="copy-btn" onclick="copyEmail()">📋 Copiar</button>
+      </div>
+    </div>
+
+    <div class="card emails-section" id="emailsSection">
+      <div class="emails-header">
+        <h2>Emails Recebidos</h2>
+        <span class="email-count" id="emailCount">0</span>
+      </div>
+
+      <div id="emailList"></div>
+    </div>
+  </div>
+
+  <div class="email-detail" id="emailDetail">
+    <div class="email-detail-content">
+      <div class="email-detail-header">
+        <button class="close-btn" onclick="closeEmailDetail()">&times;</button>
+        <h2 id="detailSubject"></h2>
+      </div>
+      <div class="email-detail-body">
+        <div class="email-meta">
+          <div class="email-meta-row">
+            <span class="email-meta-label">De:</span>
+            <span class="email-meta-value" id="detailFrom"></span>
+          </div>
+          <div class="email-meta-row">
+            <span class="email-meta-label">Para:</span>
+            <span class="email-meta-value" id="detailTo"></span>
+          </div>
+          <div class="email-meta-row">
+            <span class="email-meta-label">Data:</span>
+            <span class="email-meta-value" id="detailTime"></span>
+          </div>
+        </div>
+        <div class="email-content" id="detailBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
