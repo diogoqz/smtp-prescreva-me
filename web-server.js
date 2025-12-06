@@ -51,33 +51,45 @@ function parseEmail(raw) {
  */
 function getEmailsForAddress(emailAddress) {
   try {
+    // Verificar se diretório existe
+    if (!fs.existsSync(EMAILS_DIR)) {
+      console.log('📁 Diretório emails não existe ainda, criando...');
+      fs.mkdirSync(EMAILS_DIR, { recursive: true });
+      return [];
+    }
+
     const files = fs.readdirSync(EMAILS_DIR);
     const emails = [];
     
     for (const file of files) {
       if (!file.endsWith('.eml')) continue;
       
-      const filepath = path.join(EMAILS_DIR, file);
-      const content = fs.readFileSync(filepath, 'utf-8');
-      const data = JSON.parse(content);
-      
-      // Verificar se o email é para o endereço solicitado
-      const isForThisAddress = data.to && data.to.some(addr => 
-        addr.toLowerCase().includes(emailAddress.toLowerCase())
-      );
-      
-      if (isForThisAddress) {
-        const parsed = parseEmail(data.raw);
-        emails.push({
-          id: file,
-          timestamp: data.timestamp,
-          from: data.from || parsed.headers.from,
-          to: data.to,
-          subject: parsed.headers.subject || '(sem assunto)',
-          body: parsed.body,
-          raw: data.raw,
-          remoteAddress: data.remoteAddress
-        });
+      try {
+        const filepath = path.join(EMAILS_DIR, file);
+        const content = fs.readFileSync(filepath, 'utf-8');
+        const data = JSON.parse(content);
+        
+        // Verificar se o email é para o endereço solicitado
+        const isForThisAddress = data.to && data.to.some(addr => 
+          addr.toLowerCase().includes(emailAddress.toLowerCase())
+        );
+        
+        if (isForThisAddress) {
+          const parsed = parseEmail(data.raw);
+          emails.push({
+            id: file,
+            timestamp: data.timestamp,
+            from: data.from || parsed.headers.from,
+            to: data.to,
+            subject: parsed.headers.subject || '(sem assunto)',
+            body: parsed.body,
+            raw: data.raw,
+            remoteAddress: data.remoteAddress
+          });
+        }
+      } catch (fileError) {
+        console.error(`Erro ao processar arquivo ${file}:`, fileError.message);
+        continue; // Pular este arquivo e continuar com os outros
       }
     }
     
@@ -96,6 +108,15 @@ function getEmailsForAddress(emailAddress) {
  */
 function getStats() {
   try {
+    // Verificar se diretório existe
+    if (!fs.existsSync(EMAILS_DIR)) {
+      return {
+        totalEmails: 0,
+        oldestEmail: null,
+        newestEmail: null
+      };
+    }
+
     const files = fs.readdirSync(EMAILS_DIR);
     const emailFiles = files.filter(f => f.endsWith('.eml'));
     
@@ -105,6 +126,7 @@ function getStats() {
       newestEmail: emailFiles.length > 0 ? emailFiles[0] : null
     };
   } catch (error) {
+    console.error('Erro ao obter estatísticas:', error);
     return {
       totalEmails: 0,
       oldestEmail: null,
@@ -149,14 +171,23 @@ app.post('/api/create-inbox', (req, res) => {
  * Obter emails de um endereço
  */
 app.get('/api/emails/:email', (req, res) => {
-  const email = req.params.email;
-  const emails = getEmailsForAddress(email);
-  
-  res.json({
-    email,
-    count: emails.length,
-    emails
-  });
+  try {
+    const email = req.params.email;
+    console.log(`📬 Buscando emails para: ${email}`);
+    const emails = getEmailsForAddress(email);
+    
+    res.json({
+      email,
+      count: emails.length,
+      emails
+    });
+  } catch (error) {
+    console.error('❌ Erro na rota /api/emails:', error);
+    res.status(500).json({ 
+      error: 'Erro ao buscar emails',
+      message: error.message 
+    });
+  }
 });
 
 /**
@@ -219,6 +250,23 @@ app.get('/api/stats', (req, res) => {
   res.json(getStats());
 });
 
+// Middleware de erro global
+app.use((err, req, res, next) => {
+  console.error('❌ Erro no servidor:', err);
+  res.status(500).json({
+    error: 'Erro interno do servidor',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Erro ao processar requisição'
+  });
+});
+
+// 404 - Rota não encontrada
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Rota não encontrada',
+    path: req.path
+  });
+});
+
 // Iniciar servidor HTTP
 const server = app.listen(WEB_PORT, '0.0.0.0', () => {
   console.log(`\n🌐 Servidor Web TempMail iniciado!`);
@@ -255,6 +303,11 @@ wss.on('connection', (ws) => {
 let lastEmailCount = 0;
 setInterval(() => {
   try {
+    // Verificar se diretório existe antes de ler
+    if (!fs.existsSync(EMAILS_DIR)) {
+      return;
+    }
+
     const files = fs.readdirSync(EMAILS_DIR);
     const emailFiles = files.filter(f => f.endsWith('.eml'));
     
