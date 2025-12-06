@@ -24,7 +24,6 @@ No EasyPanel, adicione estas variáveis de ambiente:
 
 ```env
 SMTP_PORTS=2525
-HOST=0.0.0.0
 DOMAIN=prescreva.me
 SMTP_SUBDOMAIN=mail
 ALLOW_INVALID_AUTH=false
@@ -34,6 +33,8 @@ SMTP_PASSWORD=SuaSenhaSegura123!
 CLOUDFLARE_API_TOKEN=1pX_spMjhtGxgyj1tbbrL3o_uUDhWJBUyBsKKGLX
 NODE_ENV=production
 ```
+
+**NOTA**: Não é necessário definir `HOST` - o servidor sempre usará `0.0.0.0` automaticamente em containers.
 
 **IMPORTANTE**: 
 - Altere `SMTP_PASSWORD` para uma senha forte!

@@ -7,7 +7,10 @@ const path = require('path');
 const PORTS = process.env.SMTP_PORTS 
   ? process.env.SMTP_PORTS.split(',').map(p => parseInt(p.trim()))
   : [25, 587, 465, 2525];
-const HOST = process.env.HOST || '0.0.0.0';
+// IMPORTANTE: Sempre usar 0.0.0.0 para bind em containers/EasyPanel
+// Ignorar IP público se fornecido
+const HOST = '0.0.0.0';
+const PUBLIC_IP = process.env.PUBLIC_IP || process.env.HOST || 'detectar automaticamente';
 const ALLOW_INVALID_AUTH = process.env.ALLOW_INVALID_AUTH === 'true';
 const ALLOW_INSECURE_AUTH = process.env.ALLOW_INSECURE_AUTH === 'true';
 const DOMAIN = process.env.DOMAIN || 'prescreva.me';
@@ -165,11 +168,14 @@ if (servers.length > 0) {
   console.log('\n═══════════════════════════════════════════════');
   console.log('🚀 Servidor SMTP em execução');
   console.log('═══════════════════════════════════════════════');
-  console.log(`📍 Host: ${HOST}`);
+  console.log(`📍 Bind: ${HOST} (todas as interfaces)`);
   console.log(`🌐 Domínio: ${SMTP_SUBDOMAIN}.${DOMAIN}`);
   console.log(`📮 Portas ativas: ${servers.map(s => s.port).join(', ')}`);
   console.log(`📁 Emails salvos em: ${EMAILS_DIR}`);
   console.log(`🔐 Autenticação: ${ALLOW_INVALID_AUTH ? 'Modo desenvolvimento (aceita todas)' : 'Validada'}`);
+  if (PUBLIC_IP && PUBLIC_IP !== '0.0.0.0') {
+    console.log(`🔗 IP Público: ${PUBLIC_IP}`);
+  }
   console.log('═══════════════════════════════════════════════\n');
 } else {
   console.error('\n❌ Nenhum servidor SMTP foi iniciado. Verifique as configurações.\n');
