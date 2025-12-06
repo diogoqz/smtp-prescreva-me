@@ -1,0 +1,23 @@
+{
+  "name": "smtp-server",
+  "version": "1.0.0",
+  "description": "Servidor SMTP para desenvolvimento e testes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "setup": "node setup.js"
+  },
+  "keywords": ["smtp", "email", "server"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "smtp-server": "^3.13.0",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+

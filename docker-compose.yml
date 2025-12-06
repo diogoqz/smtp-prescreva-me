@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  smtp-server:
+    build: .
+    container_name: smtp-prescreva-me
+    ports:
+      # Porta 2525 (desenvolvimento/produção sem root)
+      - "2525:2525"
+      # Descomente as portas abaixo se tiver privilégios root
+      # - "25:25"
+      # - "587:587"
+      # - "465:465"
+    environment:
+      - SMTP_PORTS=2525
+      - HOST=0.0.0.0
+      - DOMAIN=prescreva.me
+      - SMTP_SUBDOMAIN=mail
+      - ALLOW_INVALID_AUTH=false
+      - ALLOW_INSECURE_AUTH=true
+      - SMTP_USERNAME=admin
+      - SMTP_PASSWORD=change_this_password
+      # Adicione seu token Cloudflare aqui
+      # - CLOUDFLARE_API_TOKEN=seu_token_aqui
+    volumes:
+      # Persistir emails recebidos
+      - ./emails:/app/emails
+    restart: unless-stopped
+    networks:
+      - smtp-network
+
+networks:
+  smtp-network:
+    driver: bridge
+

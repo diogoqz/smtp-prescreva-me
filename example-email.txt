@@ -1,0 +1,10 @@
+From: remetente@exemplo.com
+To: destinatario@exemplo.com
+Subject: Teste de Email SMTP
+Date: Mon, 1 Jan 2024 12:00:00 +0000
+
+Este é um email de teste para o servidor SMTP.
+
+Este servidor está funcionando perfeitamente!
+
+
