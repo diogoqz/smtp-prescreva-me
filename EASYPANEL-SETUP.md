@@ -24,6 +24,7 @@ No EasyPanel, adicione estas variáveis de ambiente:
 
 ```env
 SMTP_PORTS=2525
+WEB_PORT=3000
 DOMAIN=prescreva.me
 SMTP_SUBDOMAIN=mail
 ALLOW_INVALID_AUTH=false
@@ -40,12 +41,13 @@ NODE_ENV=production
 - Altere `SMTP_PASSWORD` para uma senha forte!
 - O token Cloudflare já está incluído
 
-### 4. Configurar Porta
+### 4. Configurar Portas
 
 No EasyPanel:
 1. Vá para **"Network"** ou **"Ports"**
-2. Exponha a porta **2525**
-3. Protocolo: **TCP**
+2. Exponha as seguintes portas:
+   - **2525** - SMTP Server (TCP)
+   - **3000** - Interface Web TempMail (HTTP)
 
 ### 5. Deploy
 
@@ -70,15 +72,36 @@ Nos logs do EasyPanel, você deve ver:
 ═══════════════════════════════════════════════
 🚀 Servidor SMTP em execução
 ═══════════════════════════════════════════════
-📍 Host: 0.0.0.0
+📍 Bind: 0.0.0.0 (todas as interfaces)
 🌐 Domínio: mail.prescreva.me
 📮 Portas ativas: 2525
 📁 Emails salvos em: /app/emails
 🔐 Autenticação: Validada
 ═══════════════════════════════════════════════
+
+🌐 Servidor Web TempMail iniciado!
+   URL: http://localhost:3000
+   Domínio: prescreva.me
+═══════════════════════════════════════════════
 ```
 
-## 🧪 Testar o Servidor
+## 🌐 Acessar Interface Web TempMail
+
+Após o deploy, acesse a interface web pelo domínio/IP do EasyPanel na porta 3000:
+
+```
+http://seu-app.easypanel.host:3000
+```
+
+### Funcionalidades da Interface
+
+- ✅ Criar emails temporários com nome personalizado
+- ✅ Visualizar emails recebidos em tempo real
+- ✅ Copiar email com um clique
+- ✅ Ver detalhes completos de cada email
+- ✅ Interface moderna e responsiva
+
+## 🧪 Testar o Servidor SMTP
 
 Use o seguinte código Node.js para testar:
 
