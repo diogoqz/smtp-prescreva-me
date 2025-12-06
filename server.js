@@ -83,6 +83,14 @@ const serverConfig = {
     const username = process.env.SMTP_USERNAME || 'admin';
     const password = process.env.SMTP_PASSWORD || 'password';
     
+    console.log(`🔐 Tentativa de autenticação:`);
+    console.log(`   Username esperado: ${username}`);
+    console.log(`   Username recebido: ${auth.username}`);
+    console.log(`   Username match: ${auth.username === username}`);
+    console.log(`   Senha match: ${auth.password === password}`);
+    console.log(`   Comprimento senha esperada: ${password.length}`);
+    console.log(`   Comprimento senha recebida: ${auth.password ? auth.password.length : 0}`);
+    
     if (auth.username === username && auth.password === password) {
       console.log(`✅ Autenticação bem-sucedida: ${auth.username}`);
       callback(null, { user: auth.username });
